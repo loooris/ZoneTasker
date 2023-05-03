@@ -33,11 +33,11 @@ class MainMenu : AppCompatActivity(), OnMapReadyCallback {
 
         fusedLocationProviderClient= LocationServices.getFusedLocationProviderClient(this)
 
-
         getCurrentLocationUser()
     }
 
     private fun getCurrentLocationUser(){
+        //we check if permission granted
         if(ActivityCompat.checkSelfPermission(
                 this,android.Manifest.permission.ACCESS_FINE_LOCATION)!=
             PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(
@@ -49,13 +49,16 @@ class MainMenu : AppCompatActivity(), OnMapReadyCallback {
             return
         }
 
-        val getLocation= fusedLocationProviderClient.lastLocation.addOnSuccessListener {
+        //Get Location, the last we have (most recently)
+        fusedLocationProviderClient.lastLocation.addOnSuccessListener {
                 location ->
+            //Check if location not null (can happen if location turn off on device)
             if(location != null){
                 currentLocation=location
                 Toast.makeText(applicationContext, currentLocation.latitude.toString()+""+
                         currentLocation.longitude.toString(), Toast.LENGTH_LONG).show()
 
+                //Define when the map is ready to be used.
                 val mapFragment = supportFragmentManager
                     .findFragmentById(R.id.map) as SupportMapFragment
                 mapFragment.getMapAsync(this)
@@ -63,6 +66,7 @@ class MainMenu : AppCompatActivity(), OnMapReadyCallback {
         }
     }
 
+    //We request for permission, if permission not granted
     override fun onRequestPermissionsResult(
         requestCode: Int,
         permissions: Array<out String>,
@@ -78,11 +82,11 @@ class MainMenu : AppCompatActivity(), OnMapReadyCallback {
     }
 
 
+    //When map is ready to be used, obtain an instance of google map with current location (latitude/longitude) + Add Marker on it
     override fun onMapReady(googleMap: GoogleMap) {
         val latLng= LatLng(currentLocation.latitude, currentLocation.longitude)
         val markerOptions = MarkerOptions().position(latLng).title("Current Location")
 
-        googleMap.animateCamera(CameraUpdateFactory.newLatLng(latLng))
         googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 15f))
         googleMap.addMarker(markerOptions)
     }
