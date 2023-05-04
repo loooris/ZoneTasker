@@ -1,5 +1,5 @@
 <resources>
     <string name="app_name">ZoneTasker</string>
     <string name="title_activity_main_menu">MainMenu</string>
-    <string name="searchbar_hint">Rechercher un lieu</string>
+    <string name="searchbar_hint">Search for a place</string>
 </resources>
