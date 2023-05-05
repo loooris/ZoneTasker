@@ -2,4 +2,8 @@
     <string name="app_name">ZoneTasker</string>
     <string name="title_activity_main_menu">MainMenu</string>
     <string name="searchbar_hint">Search for a place</string>
+    <string name="message">Message</string>
+    <string name="reminder">Reminder</string>
+    <string name="settings">Settings</string>
+    <string name="options">Options</string>
 </resources>
