@@ -1,5 +1,6 @@
 package com.github.loooris.zonetasker
 
+import android.content.Intent
 import android.content.pm.PackageManager
 import android.location.Location
 import androidx.appcompat.app.AppCompatActivity
@@ -15,6 +16,7 @@ import com.google.android.gms.maps.model.MarkerOptions
 import com.github.loooris.zonetasker.databinding.ActivityMainMenuBinding
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
+import com.google.android.material.floatingactionbutton.FloatingActionButton
 
 
 class MainMenu : AppCompatActivity(), OnMapReadyCallback {
@@ -31,12 +33,20 @@ class MainMenu : AppCompatActivity(), OnMapReadyCallback {
         binding = ActivityMainMenuBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        fusedLocationProviderClient= LocationServices.getFusedLocationProviderClient(this)
+        fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this)
 
         getCurrentLocationUser()
+
+        // FAB button going to optionsMenu
+        val fab: FloatingActionButton = findViewById(R.id.goToOptionsFAB)
+        fab.setOnClickListener {
+            val intent = Intent(this, OptionsMenuActivity::class.java)
+            startActivity(intent)
+        }
+
     }
 
-    private fun getCurrentLocationUser(){
+    private fun getCurrentLocationUser() {
         //we check if permission granted
         if(ActivityCompat.checkSelfPermission(
                 this,android.Manifest.permission.ACCESS_FINE_LOCATION)!=
