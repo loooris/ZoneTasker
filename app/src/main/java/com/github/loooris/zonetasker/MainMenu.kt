@@ -15,9 +15,12 @@ import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MarkerOptions
 import com.github.loooris.zonetasker.databinding.ActivityMainMenuBinding
 import com.google.android.gms.location.FusedLocationProviderClient
+import com.google.android.gms.location.Geofence
+import com.google.android.gms.location.GeofencingClient
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.maps.model.Marker
 import com.google.android.material.floatingactionbutton.FloatingActionButton
+import com.google.android.material.slider.Slider
 
 
 class MainMenu : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMapClickListener {
@@ -30,6 +33,11 @@ class MainMenu : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMapClickLi
 
     private lateinit var googleMap: GoogleMap
     private var marker: Marker? = null
+
+    lateinit var geofencingClient: GeofencingClient
+    private var radius:Float = 5F
+
+    private var geofence: Geofence? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -47,6 +55,11 @@ class MainMenu : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMapClickLi
             val intent = Intent(this, OptionsMenuActivity::class.java)
             startActivity(intent)
         }
+
+        val slider = findViewById<Slider>(R.id.slider)
+
+
+
 
     }
 
@@ -108,6 +121,31 @@ class MainMenu : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMapClickLi
 
         googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 15f))
         marker = googleMap.addMarker(markerOptions)
+
+
+         geofence = Geofence.Builder()
+            // Set the request ID of the geofence. This is a string to identify this
+            // geofence.
+            .setRequestId("0")
+
+            // Set the circular region of this geofence.
+            .setCircularRegion(
+                marker!!.position.latitude,
+                marker!!.position.longitude,
+                radius
+            )
+
+            // Set the expiration duration of the geofence. This geofence gets automatically
+            // removed after this period of time.
+            .setExpirationDuration(Geofence.NEVER_EXPIRE)
+
+            // Set the transition types of interest. Alerts are only generated for these
+            // transition. We track entry and exit transitions in this sample.
+            .setTransitionTypes(Geofence.GEOFENCE_TRANSITION_ENTER or Geofence.GEOFENCE_TRANSITION_EXIT)
+
+            // Create the geofence.
+            .build()
+
     }
 
     // Add new marker on map click and remove old marker
