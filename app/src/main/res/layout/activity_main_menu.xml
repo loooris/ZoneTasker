@@ -24,21 +24,20 @@
             android:layout_height="wrap_content"
             android:background="@null">
 
-            <com.google.android.material.search.SearchBar
-                android:id="@+id/search_bar"
-                android:layout_width="match_parent"
+            <com.google.android.material.floatingactionbutton.FloatingActionButton
+                android:id="@+id/btn_add_marker"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:hint="@string/searchbar_hint" />
+                android:clickable="true"
+                android:onClick="addMarkerAtCurrentLocation"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:srcCompat="@drawable/ic_location_crosshairs" />
 
         </com.google.android.material.appbar.AppBarLayout>
 
-        <com.google.android.material.search.SearchView
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:hint="@string/searchbar_hint"
-            app:layout_anchor="@id/search_bar">
-            <!-- Search suggestions/results go here (ScrollView, RecyclerView, etc.). -->
-        </com.google.android.material.search.SearchView>
+
 
 
         <androidx.constraintlayout.widget.ConstraintLayout

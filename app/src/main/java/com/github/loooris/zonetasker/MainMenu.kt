@@ -5,6 +5,7 @@ import android.content.pm.PackageManager
 import android.location.Location
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.view.View
 import android.widget.Toast
 import androidx.core.app.ActivityCompat
 import com.google.android.gms.maps.CameraUpdateFactory
@@ -114,6 +115,18 @@ class MainMenu : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMapClickLi
     override fun onMapClick(latLng: LatLng) {
         marker?.remove()
         val markerOptions = MarkerOptions().position(latLng)
+        marker = googleMap.addMarker(markerOptions)
+    }
+
+    fun addMarkerAtCurrentLocation(view: View) {
+        //Remove existing marker
+        marker?.remove()
+
+        // Create a new marker at the current location & Move the Camera Center
+        val latLng= LatLng(currentLocation.latitude, currentLocation.longitude)
+        val markerOptions = MarkerOptions().position(latLng).title("Current Location")
+
+        googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 15f))
         marker = googleMap.addMarker(markerOptions)
     }
 }
