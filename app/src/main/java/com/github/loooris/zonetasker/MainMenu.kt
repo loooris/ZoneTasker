@@ -15,15 +15,19 @@ import com.google.android.gms.maps.model.MarkerOptions
 import com.github.loooris.zonetasker.databinding.ActivityMainMenuBinding
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
+import com.google.android.gms.maps.model.Marker
 
 
-class MainMenu : AppCompatActivity(), OnMapReadyCallback {
+class MainMenu : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMapClickListener {
 
     private lateinit var binding: ActivityMainMenuBinding
 
     private lateinit var currentLocation : Location
     private lateinit var fusedLocationProviderClient: FusedLocationProviderClient
     private val permissionCode = 101
+
+    private lateinit var googleMap: GoogleMap
+    private var marker: Marker? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -84,10 +88,22 @@ class MainMenu : AppCompatActivity(), OnMapReadyCallback {
 
     //When map is ready to be used, obtain an instance of google map with current location (latitude/longitude) + Add Marker on it
     override fun onMapReady(googleMap: GoogleMap) {
+        this.googleMap = googleMap
+
+        // Set up on map click listener to add marker on click and remove old marker
+        googleMap.setOnMapClickListener(this)
+
         val latLng= LatLng(currentLocation.latitude, currentLocation.longitude)
         val markerOptions = MarkerOptions().position(latLng).title("Current Location")
 
         googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 15f))
-        googleMap.addMarker(markerOptions)
+        marker = googleMap.addMarker(markerOptions)
+    }
+
+    // Add new marker on map click and remove old marker
+    override fun onMapClick(latLng: LatLng) {
+        marker?.remove()
+        val markerOptions = MarkerOptions().position(latLng)
+        marker = googleMap.addMarker(markerOptions)
     }
 }
