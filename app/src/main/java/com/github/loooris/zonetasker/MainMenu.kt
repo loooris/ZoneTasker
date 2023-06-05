@@ -2,6 +2,7 @@ package com.github.loooris.zonetasker
 
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.graphics.Color
 import android.location.Location
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
@@ -17,8 +18,11 @@ import com.google.android.gms.maps.model.MarkerOptions
 import com.github.loooris.zonetasker.databinding.ActivityMainMenuBinding
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
+import com.google.android.gms.maps.model.Circle
+import com.google.android.gms.maps.model.CircleOptions
 import com.google.android.gms.maps.model.Marker
 import com.google.android.material.floatingactionbutton.FloatingActionButton
+import com.google.android.material.slider.Slider
 
 
 class MainMenu : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMapClickListener {
@@ -31,6 +35,9 @@ class MainMenu : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMapClickLi
 
     private lateinit var googleMap: GoogleMap
     private var marker: Marker? = null
+    private var circle: Circle? = null
+    private var radius = 20.0
+    private var latLng = LatLng(0.0,0.0)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -47,6 +54,14 @@ class MainMenu : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMapClickLi
         fab.setOnClickListener {
             val intent = Intent(this, OptionsMenuActivity::class.java)
             startActivity(intent)
+        }
+
+        val slider : Slider =  findViewById(R.id.slider)
+
+        slider.addOnChangeListener { _, value, _ ->
+            radius = value.toDouble()
+            circle?.remove()
+            updateCircleOptions(latLng)
         }
 
     }
@@ -107,8 +122,21 @@ class MainMenu : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMapClickLi
         val latLng= LatLng(currentLocation.latitude, currentLocation.longitude)
         val markerOptions = MarkerOptions().position(latLng).title("Current Location")
 
+        updateCircleOptions(latLng)
+
         googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 15f))
         marker = googleMap.addMarker(markerOptions)
+    }
+
+    private fun updateCircleOptions(latLng: LatLng) {
+        val circleOptions = CircleOptions()
+            .center(latLng)
+            .radius(radius)
+            .fillColor(0x40ff0000)
+            .strokeColor(Color.BLUE)
+            .strokeWidth(2f)
+
+        circle = googleMap.addCircle(circleOptions)
     }
 
     // Add new marker on map click and remove old marker
@@ -116,6 +144,9 @@ class MainMenu : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMapClickLi
         marker?.remove()
         val markerOptions = MarkerOptions().position(latLng)
         marker = googleMap.addMarker(markerOptions)
+
+        updateCircleOptions(latLng)
+        circle?.remove()
     }
 
     fun addMarkerAtCurrentLocation(view: View) {
