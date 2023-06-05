@@ -140,13 +140,15 @@ class MainMenu : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMapClickLi
     }
 
     // Add new marker on map click and remove old marker
+// Add new marker on map click and remove old marker
     override fun onMapClick(latLng: LatLng) {
         marker?.remove()
+
         val markerOptions = MarkerOptions().position(latLng)
         marker = googleMap.addMarker(markerOptions)
 
-        updateCircleOptions(latLng)
         circle?.remove()
+        updateCircleOptions(latLng)
     }
 
     fun addMarkerAtCurrentLocation(view: View) {
