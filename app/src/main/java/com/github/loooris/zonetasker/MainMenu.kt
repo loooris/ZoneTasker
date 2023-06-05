@@ -36,7 +36,7 @@ class MainMenu : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMapClickLi
     private lateinit var googleMap: GoogleMap
     private var marker: Marker? = null
     private var circle: Circle? = null
-    private var radius = 20.0
+    private var radius = 5.0
     private var latLng = LatLng(0.0,0.0)
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -112,14 +112,14 @@ class MainMenu : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMapClickLi
     }
 
 
-    //When map is ready to be used, obtain an instance of google map with current location (latitude/longitude) + Add Marker on it
+    // When map is ready to be used, obtain an instance of Google Map with current location (latitude/longitude) + Add Marker on it
     override fun onMapReady(googleMap: GoogleMap) {
         this.googleMap = googleMap
 
         // Set up on map click listener to add marker on click and remove old marker
         googleMap.setOnMapClickListener(this)
 
-        val latLng= LatLng(currentLocation.latitude, currentLocation.longitude)
+        latLng = LatLng(currentLocation.latitude, currentLocation.longitude)
         val markerOptions = MarkerOptions().position(latLng).title("Current Location")
 
         updateCircleOptions(latLng)
@@ -140,7 +140,6 @@ class MainMenu : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMapClickLi
     }
 
     // Add new marker on map click and remove old marker
-// Add new marker on map click and remove old marker
     override fun onMapClick(latLng: LatLng) {
         marker?.remove()
 
@@ -148,6 +147,7 @@ class MainMenu : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMapClickLi
         marker = googleMap.addMarker(markerOptions)
 
         circle?.remove()
+        this.latLng = latLng // Update the latLng variable with the new value
         updateCircleOptions(latLng)
     }
 
