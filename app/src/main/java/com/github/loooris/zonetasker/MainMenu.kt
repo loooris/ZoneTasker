@@ -155,6 +155,7 @@ class MainMenu : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMapClickLi
         updateCircleOptions(latLng)
         geofenceBuilder(latLng.latitude, latLng.longitude, radius)
 
+
         googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 15f))
         marker = googleMap.addMarker(markerOptions)
     }
@@ -199,6 +200,8 @@ class MainMenu : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMapClickLi
         val latLng= LatLng(currentLocation.latitude, currentLocation.longitude)
         val markerOptions = MarkerOptions().position(latLng).title("Current Location")
 
+        circle?.remove()
+        updateCircleOptions(latLng)
         googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 15f))
         marker = googleMap.addMarker(markerOptions)
 
@@ -331,13 +334,15 @@ class MainMenu : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMapClickLi
         if (geofenceList.isEmpty()) {
             Toast.makeText(this@MainMenu, "No geofences to add", Toast.LENGTH_SHORT).show()
             return
-        }
-        geoClient?.addGeofences(seekGeofencing(), geofenceIntent)?.run {
-            addOnSuccessListener {
-                Toast.makeText(this@MainMenu, "Geofences added", Toast.LENGTH_SHORT).show()
-            }
-            addOnFailureListener {
-                Toast.makeText(this@MainMenu, "Failed to add geofences", Toast.LENGTH_SHORT).show()
+        } else {
+            geoClient?.addGeofences(seekGeofencing(), geofenceIntent)?.run {
+                addOnSuccessListener {
+                    Toast.makeText(this@MainMenu, "Geofences added", Toast.LENGTH_SHORT).show()
+                }
+                addOnFailureListener {
+                    Toast.makeText(this@MainMenu, "Failed to add geofences", Toast.LENGTH_SHORT)
+                        .show()
+                }
             }
         }
     }
