@@ -160,6 +160,8 @@ class MainMenu : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMapClickLi
     }
 
     private fun updateCircleOptions(latLng: LatLng) {
+        circle?.remove() // Remove the old circle
+
         val circleOptions = CircleOptions()
             .center(latLng)
             .radius(radius.toDouble())
@@ -167,8 +169,9 @@ class MainMenu : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMapClickLi
             .strokeColor(Color.BLUE)
             .strokeWidth(2f)
 
-        circle = googleMap.addCircle(circleOptions)
+        circle = googleMap.addCircle(circleOptions) // Add the new circle
     }
+
 
     // Add new marker on map click and remove old marker
     override fun onMapClick(latLng: LatLng) {
@@ -177,15 +180,19 @@ class MainMenu : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMapClickLi
         val markerOptions = MarkerOptions().position(latLng)
         marker = googleMap.addMarker(markerOptions)
 
+        // Update circle position
         circle?.remove()
-        this.latLng = latLng // Update the latLng variable with the new value
+        this.latLng = latLng
         updateCircleOptions(latLng)
+
+        // Update geofence
         geofenceList.clear()
         geofenceBuilder(latLng.latitude, latLng.longitude, radius)
     }
 
+
     fun addMarkerAtCurrentLocation(view: View) {
-        //Remove existing marker
+        // Remove existing marker
         marker?.remove()
 
         // Create a new marker at the current location & Move the Camera Center
@@ -194,9 +201,16 @@ class MainMenu : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMapClickLi
 
         googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 15f))
         marker = googleMap.addMarker(markerOptions)
+
+        // Update circle position
+        this.latLng = latLng
+        updateCircleOptions(latLng)
+
+        // Update geofence
         geofenceList.clear()
         geofenceBuilder(latLng.latitude, latLng.longitude, radius)
     }
+
 
 
 /////////////////////////////////////////////////////////////////////////////
