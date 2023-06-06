@@ -61,9 +61,9 @@ class MainMenu : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMapClickLi
     private var radius = 5f
     private var latLng = LatLng(0.0,0.0)
 
-    private lateinit var locationRequest: LocationRequest //////NEW LOCATION UPDATE MARKER BLEU
-    private lateinit var locationCallback: LocationCallback //////NEW LOCATION UPDATE MARKER BLEU
-    private var secondmarker: Marker? = null //////NEW LOCATION UPDATE MARKER BLEU
+    private lateinit var locationRequest: LocationRequest
+    private lateinit var locationCallback: LocationCallback
+    private var secondmarker: Marker? = null
 
     private val gadgetQ = android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.Q
 
@@ -82,6 +82,8 @@ class MainMenu : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMapClickLi
 
         binding = ActivityMainMenuBinding.inflate(layoutInflater)
         setContentView(binding.root)
+
+        createChannel(this)
 
         geoClient = LocationServices.getGeofencingClient(this)
 
@@ -112,8 +114,8 @@ class MainMenu : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMapClickLi
             Log.d(TAG, "geofenceList: $geofenceList")
         }
 
-        fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this)//////NEW LOCATION UPDATE MARKER BLEU
-        setupLocationUpdates() //////NEW LOCATION UPDATE MARKER BLEU
+        fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this)
+        setupLocationUpdates()
 
 
     }
@@ -248,11 +250,11 @@ class MainMenu : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMapClickLi
         Log.d(TAG, "geofenceList: $geofenceList")
     }
 
-//////NEW LOCATION UPDATE MARKER BLEU
+
     private fun setupLocationUpdates() {
         locationRequest = LocationRequest.create().apply {
-            interval = 12000 // 12 seconds
-            fastestInterval = 10000 // 10 seconds
+            interval = 2500 // Update location every 2.5 seconds
+            fastestInterval = 2500
             priority = LocationRequest.PRIORITY_HIGH_ACCURACY
         }
 
@@ -291,10 +293,10 @@ class MainMenu : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMapClickLi
             .title("Current Location")
             .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_BLUE))
 
-        googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 15f))
+//        googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 15f))
         secondmarker = googleMap.addMarker(markerOptions)
     }
-    //////END LOCATION UPDATE MARKER BLEU
+
 
 
 /////////////////////////////////////////////////////////////////////////////
