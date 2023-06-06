@@ -60,8 +60,10 @@ class MainMenu : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMapClickLi
 
     private val geofenceIntent: PendingIntent by lazy {
         val intent = Intent(this, GeofenceBroadcastReceiver::class.java)
-        PendingIntent.getBroadcast(this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT)
+        PendingIntent.getBroadcast(
+            this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
     }
+
 
     var geofenceList = ArrayList<Geofence>()
 
@@ -85,13 +87,22 @@ class MainMenu : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMapClickLi
             startActivity(intent)
         }
 
-        val slider : Slider =  findViewById(R.id.slider)
+        val slider: Slider = findViewById(R.id.slider)
 
         slider.addOnChangeListener { _, value, _ ->
             radius = value
             circle?.remove()
             updateCircleOptions(latLng)
+
+            // Update geofence
+            geofenceList.clear()
+            geofenceBuilder(latLng.latitude, latLng.longitude, radius)
+            addGeofence() // Add the geofence
+
+            // Print in console geofenceList contents todo remove
+            Log.d(TAG, "geofenceList: $geofenceList")
         }
+
 
     }
 
@@ -175,6 +186,7 @@ class MainMenu : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMapClickLi
 
 
     // Add new marker on map click and remove old marker
+// Add new marker on map click and remove old marker
     override fun onMapClick(latLng: LatLng) {
         marker?.remove()
 
@@ -189,7 +201,12 @@ class MainMenu : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMapClickLi
         // Update geofence
         geofenceList.clear()
         geofenceBuilder(latLng.latitude, latLng.longitude, radius)
+        addGeofence() // Add the geofence
+
+        // Print in console geofenceList contents todo remove
+        Log.d(TAG, "geofenceList: $geofenceList")
     }
+
 
 
     fun addMarkerAtCurrentLocation(view: View) {
@@ -212,7 +229,12 @@ class MainMenu : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMapClickLi
         // Update geofence
         geofenceList.clear()
         geofenceBuilder(latLng.latitude, latLng.longitude, radius)
+        addGeofence() // Add the geofence
+
+        // Print in console geofenceList contents todo remove
+        Log.d(TAG, "geofenceList: $geofenceList")
     }
+
 
 
 
@@ -296,6 +318,9 @@ class MainMenu : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMapClickLi
         locationResponses.addOnCompleteListener {
             if (it.isSuccessful) {
                 addGeofence()
+
+                // Print in console geofenceList contents todo remove
+                Log.d(TAG, "geofenceList: $geofenceList")
             }
         }
     }
@@ -320,6 +345,9 @@ class MainMenu : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMapClickLi
         return GeofencingRequest.Builder().apply {
             setInitialTrigger(GeofencingRequest.INITIAL_TRIGGER_ENTER)
             addGeofences(geofenceList)
+
+            // Print in console geofenceList contents todo remove
+            Log.d(TAG, "geofenceList: $geofenceList")
         }.build()
     }
 
