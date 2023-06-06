@@ -1,7 +1,8 @@
 <resources>
-    <string name="app_name">ZoneTasker</string>
+    <string name="app_name">Zone Tasker</string>
     <string name="title_activity_main_menu">MainMenu</string>
     <string name="message">Message</string>
+    <string name="message_description">Send a message when geofence is triggered</string>
     <string name="phone_number">Phone number</string>
     <string name="reminder">Reminder</string>
     <string name="settings">Settings</string>
