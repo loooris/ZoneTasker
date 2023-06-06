@@ -119,11 +119,12 @@ class MainMenu : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMapClickLi
     }
 
     private fun getCurrentLocationUser() {
+
         //we check if permission granted
         if(ActivityCompat.checkSelfPermission(
-                this,android.Manifest.permission.ACCESS_FINE_LOCATION)!=
+                this, android.Manifest.permission.ACCESS_FINE_LOCATION)!=
             PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(
-                this,android.Manifest.permission.ACCESS_COARSE_LOCATION)!=
+                this, android.Manifest.permission.ACCESS_COARSE_LOCATION)!=
             PackageManager.PERMISSION_GRANTED){
 
             ActivityCompat.requestPermissions(this,
@@ -409,7 +410,7 @@ class MainMenu : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMapClickLi
         }.build()
     }
 
-    private fun addGeofence(){
+    private fun addGeofence() {
         if (ActivityCompat.checkSelfPermission(
                 this,
                 Manifest.permission.ACCESS_FINE_LOCATION

@@ -14,14 +14,19 @@ private const val TAG = "GeofenceBroadcastReceiv"
 
 class GeofenceBroadcastReceiver : BroadcastReceiver() {
     override fun onReceive(context: Context?, intent: Intent?) {
-        val geofencingEvent = GeofencingEvent.fromIntent(intent!!)
-        if (geofencingEvent!!.hasError()) {
+        if (intent == null) {
+            Log.e(TAG, "Intent is null")
+            return
+        }
+
+        val geofencingEvent = GeofencingEvent.fromIntent(intent)
+        if (geofencingEvent?.hasError() == true) {
             val errorMessage = GeofenceStatusCodes.getStatusCodeString(geofencingEvent.errorCode)
             Log.e(TAG, errorMessage)
             return
         }
 
-        val geofenceTransition = geofencingEvent.geofenceTransition
+        val geofenceTransition = geofencingEvent?.geofenceTransition
         if (geofenceTransition == Geofence.GEOFENCE_TRANSITION_ENTER) {
             val triggeringGeofences = geofencingEvent.triggeringGeofences
 
