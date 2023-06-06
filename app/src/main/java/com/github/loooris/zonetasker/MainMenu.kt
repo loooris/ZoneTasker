@@ -34,6 +34,11 @@ import com.google.android.gms.maps.model.CircleOptions
 import com.google.android.gms.maps.model.Marker
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.slider.Slider
+import android.os.Handler
+import android.os.Looper
+import com.google.android.gms.location.*
+import com.google.android.gms.maps.model.BitmapDescriptorFactory
+
 
 private const val TAG = "MainMenu"
 private lateinit var geoClient: GeofencingClient
@@ -55,6 +60,10 @@ class MainMenu : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMapClickLi
     private var circle: Circle? = null
     private var radius = 5f
     private var latLng = LatLng(0.0,0.0)
+
+    private lateinit var locationRequest: LocationRequest //////NEW LOCATION UPDATE MARKER BLEU
+    private lateinit var locationCallback: LocationCallback //////NEW LOCATION UPDATE MARKER BLEU
+    private var secondmarker: Marker? = null //////NEW LOCATION UPDATE MARKER BLEU
 
     private val gadgetQ = android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.Q
 
@@ -102,6 +111,9 @@ class MainMenu : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMapClickLi
             // Print in console geofenceList contents todo remove
             Log.d(TAG, "geofenceList: $geofenceList")
         }
+
+        fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this)//////NEW LOCATION UPDATE MARKER BLEU
+        setupLocationUpdates() //////NEW LOCATION UPDATE MARKER BLEU
 
 
     }
@@ -235,7 +247,53 @@ class MainMenu : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMapClickLi
         Log.d(TAG, "geofenceList: $geofenceList")
     }
 
+//////NEW LOCATION UPDATE MARKER BLEU
+    private fun setupLocationUpdates() {
+        locationRequest = LocationRequest.create().apply {
+            interval = 12000 // 12 seconds
+            fastestInterval = 10000 // 10 seconds
+            priority = LocationRequest.PRIORITY_HIGH_ACCURACY
+        }
 
+        locationCallback = object : LocationCallback() {
+            override fun onLocationResult(locationResult: LocationResult) {
+                locationResult.lastLocation?.let { location ->
+                    currentLocation = location
+                    updateMarkerWithCurrentLocation()
+                }
+            }
+        }
+    }
+
+    private fun startLocationUpdates() {
+        if (ActivityCompat.checkSelfPermission(
+                this,
+                Manifest.permission.ACCESS_FINE_LOCATION
+            ) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(
+                this,
+                Manifest.permission.ACCESS_COARSE_LOCATION
+            ) != PackageManager.PERMISSION_GRANTED
+        ) {
+            return
+        }
+        fusedLocationProviderClient.requestLocationUpdates(locationRequest, locationCallback, Looper.getMainLooper())
+    }
+
+    private fun updateMarkerWithCurrentLocation() {
+        // Remove existing marker
+        secondmarker?.remove()
+
+        // Create a new marker at the updated current location & Move the Camera Center
+        val latLng = LatLng(currentLocation.latitude, currentLocation.longitude)
+        val markerOptions = MarkerOptions()
+            .position(latLng)
+            .title("Current Location")
+            .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_BLUE))
+
+        googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 15f))
+        secondmarker = googleMap.addMarker(markerOptions)
+    }
+    //////END LOCATION UPDATE MARKER BLEU
 
 
 /////////////////////////////////////////////////////////////////////////////
@@ -401,6 +459,7 @@ class MainMenu : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMapClickLi
     override fun onStart() {
         super.onStart()
         examinePermisionAndinitiatGeofence()
+        startLocationUpdates()
     }
 
     override fun onDestroy() {
