@@ -1,11 +1,16 @@
 package com.github.loooris.zonetasker
 
+import android.Manifest
+import android.annotation.TargetApi
+import android.app.PendingIntent
 import android.content.Intent
+import android.content.IntentSender
 import android.content.pm.PackageManager
 import android.graphics.Color
 import android.location.Location
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import android.widget.Toast
 import androidx.core.app.ActivityCompat
@@ -16,14 +21,26 @@ import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MarkerOptions
 import com.github.loooris.zonetasker.databinding.ActivityMainMenuBinding
+import com.google.android.gms.common.api.ResolvableApiException
 import com.google.android.gms.location.FusedLocationProviderClient
+import com.google.android.gms.location.Geofence
+import com.google.android.gms.location.GeofencingClient
+import com.google.android.gms.location.GeofencingRequest
+import com.google.android.gms.location.LocationRequest
 import com.google.android.gms.location.LocationServices
+import com.google.android.gms.location.LocationSettingsRequest
 import com.google.android.gms.maps.model.Circle
 import com.google.android.gms.maps.model.CircleOptions
 import com.google.android.gms.maps.model.Marker
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.slider.Slider
 
+private const val TAG = "MainMenu"
+private lateinit var geoClient: GeofencingClient
+private val REQUEST_TURN_DEVICE_LOCATION_ON = 20
+private val REQUEST_FOREGROUND_AND_BACKGROUND_PERMISSION_RESULT_CODE = 3
+private val REQUEST_FOREGROUND_ONLY_PERMISSIONS_REQUEST_CODE = 4
+private val REQUEST_LOCATION_PERMISSION = 10
 
 class MainMenu : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMapClickListener {
 
@@ -36,14 +53,26 @@ class MainMenu : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMapClickLi
     private lateinit var googleMap: GoogleMap
     private var marker: Marker? = null
     private var circle: Circle? = null
-    private var radius = 5.0
+    private var radius = 5f
     private var latLng = LatLng(0.0,0.0)
+
+    private val gadgetQ = android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.Q
+
+    private val geofenceIntent: PendingIntent by lazy {
+        val intent = Intent(this, GeofenceBroadcastReceiver::class.java)
+        PendingIntent.getBroadcast(this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT)
+    }
+
+    var geofenceList = ArrayList<Geofence>()
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         binding = ActivityMainMenuBinding.inflate(layoutInflater)
         setContentView(binding.root)
+
+        geoClient = LocationServices.getGeofencingClient(this)
 
         fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this)
 
@@ -59,7 +88,7 @@ class MainMenu : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMapClickLi
         val slider : Slider =  findViewById(R.id.slider)
 
         slider.addOnChangeListener { _, value, _ ->
-            radius = value.toDouble()
+            radius = value
             circle?.remove()
             updateCircleOptions(latLng)
         }
@@ -84,8 +113,8 @@ class MainMenu : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMapClickLi
                 location ->
             //Check if location not null (can happen if location turn off on device)
             if(location != null){
-                currentLocation=location
-                Toast.makeText(applicationContext, currentLocation.latitude.toString()+""+
+                currentLocation = location
+                Toast.makeText(applicationContext, currentLocation.latitude.toString() + "" +
                         currentLocation.longitude.toString(), Toast.LENGTH_LONG).show()
 
                 //Define when the map is ready to be used.
@@ -97,19 +126,20 @@ class MainMenu : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMapClickLi
     }
 
     //We request for permission, if permission not granted
-    override fun onRequestPermissionsResult(
-        requestCode: Int,
-        permissions: Array<out String>,
-        grantResults: IntArray
-    ) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-        when(requestCode){
-            permissionCode -> if(grantResults.isNotEmpty() && grantResults[0]==
-                PackageManager.PERMISSION_GRANTED){
-                getCurrentLocationUser()
-            }
-        }
-    }
+    // TODO check
+//    override fun onRequestPermissionsResult(
+//        requestCode: Int,
+//        permissions: Array<out String>,
+//        grantResults: IntArray
+//    ) {
+//        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+//        when(requestCode){
+//            permissionCode -> if(grantResults.isNotEmpty() && grantResults[0]==
+//                PackageManager.PERMISSION_GRANTED){
+//                getCurrentLocationUser()
+//            }
+//        }
+//    }
 
 
     // When map is ready to be used, obtain an instance of Google Map with current location (latitude/longitude) + Add Marker on it
@@ -123,6 +153,7 @@ class MainMenu : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMapClickLi
         val markerOptions = MarkerOptions().position(latLng).title("Current Location")
 
         updateCircleOptions(latLng)
+        geofenceBuilder(latLng.latitude, latLng.longitude, radius)
 
         googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 15f))
         marker = googleMap.addMarker(markerOptions)
@@ -131,7 +162,7 @@ class MainMenu : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMapClickLi
     private fun updateCircleOptions(latLng: LatLng) {
         val circleOptions = CircleOptions()
             .center(latLng)
-            .radius(radius)
+            .radius(radius.toDouble())
             .fillColor(0x40ff0000)
             .strokeColor(Color.BLUE)
             .strokeWidth(2f)
@@ -149,6 +180,8 @@ class MainMenu : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMapClickLi
         circle?.remove()
         this.latLng = latLng // Update the latLng variable with the new value
         updateCircleOptions(latLng)
+        geofenceList.clear()
+        geofenceBuilder(latLng.latitude, latLng.longitude, radius)
     }
 
     fun addMarkerAtCurrentLocation(view: View) {
@@ -161,5 +194,170 @@ class MainMenu : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMapClickLi
 
         googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 15f))
         marker = googleMap.addMarker(markerOptions)
+        geofenceList.clear()
+        geofenceBuilder(latLng.latitude, latLng.longitude, radius)
+    }
+
+
+/////////////////////////////////////////////////////////////////////////////
+
+    // check if background and foreground permissions are approved
+    @TargetApi(29)
+    private fun authorizedLocation(): Boolean {
+        val formalizeForeground = (
+                PackageManager.PERMISSION_GRANTED == ActivityCompat.checkSelfPermission(
+                    this, Manifest.permission.ACCESS_FINE_LOCATION
+                ))
+        val formalizeBackground =
+            if (gadgetQ) {
+                PackageManager.PERMISSION_GRANTED == ActivityCompat.checkSelfPermission(
+                    this, Manifest.permission.ACCESS_BACKGROUND_LOCATION
+                )
+            } else {
+                true
+            }
+        return formalizeForeground && formalizeBackground
+    }
+
+    @TargetApi(29)
+    private fun askLocationPermission() {
+        if (authorizedLocation())
+            return
+        var grantingPermission = arrayOf(Manifest.permission.ACCESS_FINE_LOCATION)
+        val customResult = when {
+            gadgetQ -> {
+                grantingPermission += Manifest.permission.ACCESS_BACKGROUND_LOCATION
+                REQUEST_FOREGROUND_AND_BACKGROUND_PERMISSION_RESULT_CODE
+            }
+            else -> REQUEST_FOREGROUND_ONLY_PERMISSIONS_REQUEST_CODE
+        }
+        Log.d(TAG, "askLocationPermission: ")
+        ActivityCompat.requestPermissions(
+            this,
+            grantingPermission,
+            customResult
+        )
+
+    }
+
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<out String>,
+        grantResults: IntArray
+    ) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        if (requestCode == REQUEST_LOCATION_PERMISSION) {
+            if (grantResults.size > 0 && (grantResults[0] == PackageManager.PERMISSION_GRANTED))
+                getCurrentLocationUser()
+        }
+    }
+
+    private fun validateGadgetAreaInitiateGeofence(resolve: Boolean = true) {
+        val locationRequest = LocationRequest.create().apply {
+            priority = LocationRequest.PRIORITY_LOW_POWER
+        }
+        val builder = LocationSettingsRequest.Builder().addLocationRequest(locationRequest)
+
+        val client = LocationServices.getSettingsClient(this)
+        val locationResponses =
+            client.checkLocationSettings(builder.build())
+
+        locationResponses.addOnFailureListener { exception ->
+            if (exception is ResolvableApiException && resolve) {
+                try {
+                    exception.startResolutionForResult(
+                        this,
+                        REQUEST_TURN_DEVICE_LOCATION_ON
+                    )
+                } catch (sendEx: IntentSender.SendIntentException) {
+                    Log.d(TAG, "Error geting location settings resolution: " + sendEx.message)
+                }
+            } else {
+                Toast.makeText(this, "Enable your location", Toast.LENGTH_SHORT).show()
+            }
+        }
+        locationResponses.addOnCompleteListener {
+            if (it.isSuccessful) {
+                addGeofence()
+            }
+        }
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        validateGadgetAreaInitiateGeofence(false)
+    }
+
+    // Fonction for creating geofences
+    private fun geofenceBuilder(latitude: Double, longitude: Double, radius: Float) {
+        geofenceList.add(Geofence.Builder()
+            .setRequestId("entry.key")
+            .setCircularRegion(latitude, longitude, radius)
+            .setExpirationDuration(Geofence.NEVER_EXPIRE)
+            .setTransitionTypes(Geofence.GEOFENCE_TRANSITION_ENTER)
+            .build())
+    }
+
+
+    private fun seekGeofencing(): GeofencingRequest {
+        return GeofencingRequest.Builder().apply {
+            setInitialTrigger(GeofencingRequest.INITIAL_TRIGGER_ENTER)
+            addGeofences(geofenceList)
+        }.build()
+    }
+
+    private fun addGeofence(){
+        if (ActivityCompat.checkSelfPermission(
+                this,
+                Manifest.permission.ACCESS_FINE_LOCATION
+            ) != PackageManager.PERMISSION_GRANTED
+        ) {
+            return
+        }
+        if (geofenceList.isEmpty()) {
+            Toast.makeText(this@MainMenu, "No geofences to add", Toast.LENGTH_SHORT).show()
+            return
+        }
+        geoClient?.addGeofences(seekGeofencing(), geofenceIntent)?.run {
+            addOnSuccessListener {
+                Toast.makeText(this@MainMenu, "Geofences added", Toast.LENGTH_SHORT).show()
+            }
+            addOnFailureListener {
+                Toast.makeText(this@MainMenu, "Failed to add geofences", Toast.LENGTH_SHORT).show()
+            }
+        }
+    }
+
+
+
+    private fun removeGeofence(){
+        geoClient?.removeGeofences(geofenceIntent)?.run {
+            addOnSuccessListener {
+                Toast.makeText(this@MainMenu, "Geofences removed", Toast.LENGTH_SHORT).show()
+
+            }
+            addOnFailureListener {
+                Toast.makeText(this@MainMenu, "Failed to remove geofences", Toast.LENGTH_SHORT).show()
+            }
+        }
+    }
+
+
+    private fun examinePermisionAndinitiatGeofence() {
+        if (authorizedLocation()) {
+            validateGadgetAreaInitiateGeofence()
+        } else {
+            askLocationPermission()
+        }
+    }
+
+    override fun onStart() {
+        super.onStart()
+        examinePermisionAndinitiatGeofence()
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        removeGeofence()
     }
 }
