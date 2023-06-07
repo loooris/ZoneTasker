@@ -244,8 +244,9 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMapClic
         return CircleOptions()
             .center(latLng)
             .radius(radius)
-            .strokeColor(ContextCompat.getColor(this, R.color.borderGeofenceZone))
-            .fillColor(ContextCompat.getColor(this, R.color.inGeofenceZone))
+            .fillColor(0x40ff0000)
+            .strokeColor(Color.BLUE)
+            .strokeWidth(2f)
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
@@ -403,13 +404,7 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMapClic
 
         // Geofence + Circle
         circle?.remove()
-        val circleOptions =  CircleOptions()
-            .center(LatLng(latLng.latitude, latLng.longitude))
-            .radius(GEOFENCE_RADIUS)
-            .strokeColor(ContextCompat.getColor(this, R.color.borderGeofenceZone))
-            .fillColor(ContextCompat.getColor(this, R.color.inGeofenceZone))
-
-        circle = map.addCircle(circleOptions)
+        circle = map.addCircle(getGeofenceZone(latLng, GEOFENCE_RADIUS))
 
     }
 
