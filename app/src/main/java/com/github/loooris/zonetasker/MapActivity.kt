@@ -47,6 +47,7 @@ import com.google.android.gms.maps.model.CircleOptions
 import com.google.android.gms.maps.model.Marker
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.floatingactionbutton.FloatingActionButton
+import com.google.android.material.slider.Slider
 import java.io.IOException
 
 @SuppressLint("MissingPermission")
@@ -56,6 +57,7 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMapClic
 
     private var marker: Marker? = null
     private var circle: Circle? = null
+    private var latLng = LatLng(46.2043907,6.1431577)
 
     private lateinit var viewModel: MainVM
 //    private var map: GoogleMap? = null
@@ -64,6 +66,7 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMapClic
     private val locationRequest = LocationRequest()
     private var initiateMapZoom = true
     private lateinit var fusedLocationClient: FusedLocationProviderClient
+    private var GEOFENCE_RADIUS = 1000.00
 
     companion object {
         private const val LOCATION_PERMISSION = 101
@@ -74,7 +77,7 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMapClic
         private var GEOFENCE_LONG = 6.1431577
 
 
-        private const val GEOFENCE_RADIUS = 1000.00
+
         private const val CHANNEL_ID = "200"
         private const val NOTIFICATION_ID = 103
         private const val CHANNEL_NAME = "PushNotificationChannel"
@@ -89,6 +92,22 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMapClic
 //        fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this) //todo
 
 //        getCurrentLocationUser() todo ancien
+
+        val slider: Slider = findViewById(R.id.slider)
+
+        slider.addOnChangeListener { _, value, _ ->
+            GEOFENCE_RADIUS = value.toDouble()
+            circle?.remove()
+
+            val circleOptions =  CircleOptions()
+                .center(latLng)
+                .radius(GEOFENCE_RADIUS)
+                .fillColor(0x40ff0000)
+                .strokeColor(Color.BLUE)
+                .strokeWidth(2f)
+
+            circle = map.addCircle(circleOptions)
+        }
 
 
         //As soon as the application starts, we get the location permission and create the map.
@@ -380,6 +399,8 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMapClic
         marker?.remove()
         val markerOptions = MarkerOptions().position(latLng)
         marker = map.addMarker(markerOptions)
+
+        this.latLng = latLng
 
         // Geofence + Circle
         circle?.remove()
