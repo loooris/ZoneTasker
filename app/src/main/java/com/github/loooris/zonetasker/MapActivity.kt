@@ -112,20 +112,14 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMapClic
     }
 
     private fun askLocationPermission() {
-        if (!isLocationPermissionGranted())
-        {
+        if (!isLocationPermissionGranted()) {
             //For first launch...
-            if (ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.ACCESS_FINE_LOCATION))
-            {
+            if (ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.ACCESS_FINE_LOCATION)) {
+                ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.ACCESS_FINE_LOCATION), LOCATION_PERMISSION)
+            } else {
                 ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.ACCESS_FINE_LOCATION), LOCATION_PERMISSION)
             }
-            else
-            {
-                ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.ACCESS_FINE_LOCATION), LOCATION_PERMISSION)
-            }
-        }
-        else
-        {
+        } else {
             prepareActivity()
         }
     }
@@ -135,15 +129,11 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMapClic
         when (requestCode)
         {
             LOCATION_PERMISSION -> {
-                if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED)
-                {
-                    if (isLocationPermissionGranted())
-                    {
+                if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    if (isLocationPermissionGranted()) {
                         prepareActivity()
                     }
-                }
-                else
-                {
+                } else {
                     askLocationPermission()
                 }
                 return
@@ -284,30 +274,39 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMapClic
         getCurrentLocation()
 
         // Fetch the current location and set the marker + geofence
-        requestMyGpsLocation { location ->
-            val currentLatLng = LatLng(location.latitude, location.longitude)
-            map.clear() // Clear any existing markers or circles
-
-            // Marker
-            val markerOptions = MarkerOptions().position(currentLatLng).title("Current Location")
-            marker = map.addMarker(markerOptions)
-
-            // Geofence
-            circle = map.addCircle(getGeofenceZone(currentLatLng, GEOFENCE_RADIUS))
-            map.animateCamera(CameraUpdateFactory.newLatLngZoom(currentLatLng, 15.0F))
-
-            //Slider
-            val slider: Slider = findViewById(R.id.slider)
-            latLng = currentLatLng
-            slider.addOnChangeListener { _, value, _ ->
-                GEOFENCE_RADIUS = value.toDouble()
-                circle?.remove()
-                circle = map.addCircle(getGeofenceZone(latLng, GEOFENCE_RADIUS))
-            }
-        }
+        setupMapAfterGettingLocation()
 
         // Set up on map click listener to add marker on click and remove old marker
         googleMap.setOnMapClickListener(this)
+    }
+
+
+    @SuppressLint("MissingPermission")
+    private fun setupMapAfterGettingLocation() {
+        val client = LocationServices.getFusedLocationProviderClient(this)
+        client.lastLocation.addOnSuccessListener { location: Location? ->
+            location?.let {
+                val currentLatLng = LatLng(it.latitude, it.longitude)
+                map.clear() // Clear any existing markers or circles
+
+                // Marker
+                val markerOptions = MarkerOptions().position(currentLatLng).title("Current Location")
+                marker = map.addMarker(markerOptions)
+
+                // Geofence
+                circle = map.addCircle(getGeofenceZone(currentLatLng, GEOFENCE_RADIUS))
+                map.animateCamera(CameraUpdateFactory.newLatLngZoom(currentLatLng, 15.0F))
+
+                //Slider
+                val slider: Slider = findViewById(R.id.slider)
+                latLng = currentLatLng
+                slider.addOnChangeListener { _, value, _ ->
+                    GEOFENCE_RADIUS = value.toDouble()
+                    circle?.remove()
+                    circle = map.addCircle(getGeofenceZone(latLng, GEOFENCE_RADIUS))
+                }
+            }
+        }
     }
 
 
