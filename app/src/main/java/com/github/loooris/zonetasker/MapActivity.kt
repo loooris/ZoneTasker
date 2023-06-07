@@ -248,7 +248,7 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMapClic
                         if (initiateMapZoom)
                         {
                             initiateMapZoom = false
-                            map?.animateCamera(CameraUpdateFactory.newLatLngZoom(LatLng(location.latitude, location.longitude), 10F))
+                            map?.animateCamera(CameraUpdateFactory.newLatLngZoom(LatLng(location.latitude, location.longitude), 15.0F))
                         }
                     }
                 }
@@ -298,7 +298,7 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMapClic
 
             // Geofence
             circle = map.addCircle(getGeofenceZone(currentLatLng, GEOFENCE_RADIUS))
-            map.animateCamera(CameraUpdateFactory.newLatLngZoom(currentLatLng, 18F))
+            map.animateCamera(CameraUpdateFactory.newLatLngZoom(currentLatLng, 15.0F))
 
             //Slider
             val slider: Slider = findViewById(R.id.slider)
@@ -414,7 +414,7 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMapClic
             // Create a new marker at the current location & Move the Camera Center
             latLng = LatLng(location.latitude, location.longitude)
             val markerOptions = MarkerOptions().position(latLng).title("Current Location")
-            map.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 18f))
+            map.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 15.0F))
             marker = map.addMarker(markerOptions)
 
             // Geofence + Circle
