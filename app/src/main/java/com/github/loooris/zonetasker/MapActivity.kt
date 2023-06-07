@@ -66,7 +66,7 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMapClic
     private val locationRequest = LocationRequest()
     private var initiateMapZoom = true
     private lateinit var fusedLocationClient: FusedLocationProviderClient
-    private var GEOFENCE_RADIUS = 1000.00
+    private var GEOFENCE_RADIUS = 50.00
 
     private var currentLocation: Location? = null
 
@@ -94,15 +94,6 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMapClic
 //        fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this) //todo
 
 //        getCurrentLocationUser() todo ancien
-
-        val slider: Slider = findViewById(R.id.slider)
-
-        slider.addOnChangeListener { _, value, _ ->
-            GEOFENCE_RADIUS = value.toDouble()
-            circle?.remove()
-            circle = map.addCircle(getGeofenceZone(latLng, GEOFENCE_RADIUS))
-        }
-
 
         //As soon as the application starts, we get the location permission and create the map.
         askLocationPermission()
@@ -204,7 +195,6 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMapClic
             if (location != null) {
                 val markerOptions = MarkerOptions().position(LatLng(location.latitude, location.longitude)).title("Current Location")
                 marker = map.addMarker(markerOptions)
-                //latLng = LatLng(location.latitude, location.longitude) sert a rien pour le moment mais j'essaie de regler le soucis du cercle rouge au debut
             }
         }
     }
@@ -308,7 +298,16 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMapClic
 
             // Geofence
             circle = map.addCircle(getGeofenceZone(currentLatLng, GEOFENCE_RADIUS))
-            map.animateCamera(CameraUpdateFactory.newLatLngZoom(currentLatLng, 25F))
+            map.animateCamera(CameraUpdateFactory.newLatLngZoom(currentLatLng, 18F))
+
+            //Slider
+            val slider: Slider = findViewById(R.id.slider)
+            latLng = currentLatLng
+            slider.addOnChangeListener { _, value, _ ->
+                GEOFENCE_RADIUS = value.toDouble()
+                circle?.remove()
+                circle = map.addCircle(getGeofenceZone(latLng, GEOFENCE_RADIUS))
+            }
         }
 
         // Set up on map click listener to add marker on click and remove old marker
@@ -413,9 +412,9 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMapClic
         currentLocation?.let { location ->
 
             // Create a new marker at the current location & Move the Camera Center
-            val latLng = LatLng(location.latitude, location.longitude)
+            latLng = LatLng(location.latitude, location.longitude)
             val markerOptions = MarkerOptions().position(latLng).title("Current Location")
-            map.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 15f))
+            map.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 18f))
             marker = map.addMarker(markerOptions)
 
             // Geofence + Circle
