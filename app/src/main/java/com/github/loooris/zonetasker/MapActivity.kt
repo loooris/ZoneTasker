@@ -300,8 +300,9 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMapClic
         // Fetch the current location and set the geofence
         requestMyGpsLocation { location ->
             val currentLatLng = LatLng(location.latitude, location.longitude)
+            map.clear() // Clear any existing markers or circles
             circle = map.addCircle(getGeofenceZone(currentLatLng, GEOFENCE_RADIUS))
-            map?.animateCamera(CameraUpdateFactory.newLatLngZoom(currentLatLng, 12F))
+            map.animateCamera(CameraUpdateFactory.newLatLngZoom(currentLatLng, 12F))
         }
 
         // Set up on map click listener to add marker on click and remove old marker
