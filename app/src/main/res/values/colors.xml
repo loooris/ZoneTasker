@@ -61,4 +61,7 @@
     <color name="md_theme_dark_surfaceTint">#F4BE48</color>
     <color name="md_theme_dark_outlineVariant">#4D4639</color>
     <color name="md_theme_dark_scrim">#000000</color>
+
+    <color name="inGeofenceZone">#ffcdd2</color>
+    <color name="borderGeofenceZone">#90caf9</color>
 </resources>
