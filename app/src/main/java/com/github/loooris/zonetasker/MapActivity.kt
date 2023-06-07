@@ -9,6 +9,7 @@ import android.content.Context
 import android.content.Intent
 import android.content.IntentSender
 import android.content.pm.PackageManager
+import android.graphics.Color
 import android.location.Address
 import android.location.Geocoder
 import android.location.Location
@@ -41,6 +42,7 @@ import com.google.android.gms.location.LocationResult
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.location.LocationSettingsRequest
 import com.google.android.gms.location.LocationSettingsStatusCodes
+import com.google.android.gms.maps.model.Circle
 import com.google.android.gms.maps.model.CircleOptions
 import com.google.android.gms.maps.model.Marker
 import com.google.android.material.button.MaterialButton
@@ -53,7 +55,7 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMapClic
     private lateinit var binding: ActivityMapBinding
 
     private var marker: Marker? = null
-
+    private var circle: Circle? = null
 
     private lateinit var viewModel: MainVM
 //    private var map: GoogleMap? = null
@@ -297,7 +299,16 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMapClic
         map.uiSettings.isScrollGesturesEnabled = true
         map.uiSettings.setAllGesturesEnabled(true)
         map.uiSettings.isMyLocationButtonEnabled = true
-        map.addCircle(getGeofenceZone(GEOFENCE_LAT, GEOFENCE_LONG, GEOFENCE_RADIUS))
+
+
+        val circleOptions =  CircleOptions()
+            .center(LatLng(GEOFENCE_LAT, GEOFENCE_LONG))
+            .radius(GEOFENCE_RADIUS)
+            .fillColor(0x40ff0000)
+            .strokeColor(Color.BLUE)
+            .strokeWidth(2f)
+
+        circle = map.addCircle(circleOptions)
     }
 
     private fun getCurrentLocation() {
@@ -371,7 +382,15 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMapClic
         marker = map.addMarker(markerOptions)
 
         // Geofence + Circle
-        map.addCircle(getGeofenceZone(latLng.latitude, latLng.longitude, GEOFENCE_RADIUS))
+        circle?.remove()
+        val circleOptions =  CircleOptions()
+            .center(LatLng(latLng.latitude, latLng.longitude))
+            .radius(GEOFENCE_RADIUS)
+            .fillColor(0x40ff0000)
+            .strokeColor(Color.BLUE)
+            .strokeWidth(2f)
+
+        circle = map.addCircle(circleOptions)
 
     }
 
