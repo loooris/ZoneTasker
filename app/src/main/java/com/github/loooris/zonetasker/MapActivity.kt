@@ -68,6 +68,9 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMapClic
     private lateinit var fusedLocationClient: FusedLocationProviderClient
     private var GEOFENCE_RADIUS = 1000.00
 
+    private var currentLocation: Location? = null
+
+
     companion object {
         private const val LOCATION_PERMISSION = 101
         private const val LOCATION_REQUEST_CODE = 102
@@ -75,7 +78,6 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMapClic
         //Geneve
         private var GEOFENCE_LAT = 46.2043907
         private var GEOFENCE_LONG = 6.1431577
-
 
 
         private const val CHANNEL_ID = "200"
@@ -98,14 +100,7 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMapClic
         slider.addOnChangeListener { _, value, _ ->
             GEOFENCE_RADIUS = value.toDouble()
             circle?.remove()
-
-            val circleOptions =  CircleOptions()
-                .center(latLng)
-                .radius(GEOFENCE_RADIUS)
-                .strokeColor(ContextCompat.getColor(this, R.color.borderGeofenceZone))
-                .fillColor(ContextCompat.getColor(this, R.color.inGeofenceZone))
-
-            circle = map.addCircle(circleOptions)
+            circle = map.addCircle(getGeofenceZone(latLng, GEOFENCE_RADIUS))
         }
 
 
@@ -344,32 +339,33 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMapClic
         val task = LocationServices.getSettingsClient(this).checkLocationSettings(builder.build())
 
         task.addOnCompleteListener {
-            try
-            {
-                it.getResult(ApiException::class.java)
-                requestMyGpsLocation { location ->
-                    if (initiateMapZoom) {
-                        initiateMapZoom = false
-                        map?.animateCamera(CameraUpdateFactory.newLatLngZoom(LatLng(location.latitude, location.longitude), 12F))
+            try {
+                val result = it.getResult(ApiException::class.java)
+                if (result?.locationSettingsStates?.isLocationPresent == true) {
+                    requestMyGpsLocation { location ->
+                        currentLocation = location // Update currentLocation field
+                        if (initiateMapZoom) {
+                            initiateMapZoom = false
+                            map?.animateCamera(
+                                CameraUpdateFactory.newLatLngZoom(
+                                    LatLng(location.latitude, location.longitude),
+                                    12F
+                                )
+                            )
+                        }
                     }
                 }
-            }
-            catch (exception: ApiException)
-            {
-                when (exception.statusCode)
-                {
+            } catch (exception: ApiException) {
+                when (exception.statusCode) {
                     LocationSettingsStatusCodes.RESOLUTION_REQUIRED ->
-                        try
-                        {
+                        try {
                             val resolvable = exception as ResolvableApiException
                             resolvable.startResolutionForResult(this, LOCATION_REQUEST_CODE)
                         }
-                        catch (e: IntentSender.SendIntentException)
-                        {
+                        catch (e: IntentSender.SendIntentException) {
                             Log.d("", "exception catched at getCurrentLocation: $e")
                         }
-                        catch (e: ClassCastException)
-                        {
+                        catch (e: ClassCastException) {
                             Log.d("", "exception catched at getCurrentLocation: $e")
                         }
                     LocationSettingsStatusCodes.SETTINGS_CHANGE_UNAVAILABLE -> { }
@@ -410,15 +406,23 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMapClic
 
     }
 
-//    fun addMarkerAtCurrentLocation(view: View) { todo à faire
-//        //Remove existing marker
-//        marker?.remove()
-//
-//        // Create a new marker at the current location & Move the Camera Center
-//        val latLng= LatLng(currentLocation.latitude, currentLocation.longitude)
-//        val markerOptions = MarkerOptions().position(latLng).title("Current Location")
-//
-//        map.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 15f))
-//        marker = map.addMarker(markerOptions)
-//    }
+    fun addMarkerAtCurrentLocation(view: View) {
+        // Remove existing marker
+        marker?.remove()
+
+        // Check if currentLocation is not null
+        currentLocation?.let { location ->
+
+            // Create a new marker at the current location & Move the Camera Center
+            val latLng = LatLng(location.latitude, location.longitude)
+            val markerOptions = MarkerOptions().position(latLng).title("Current Location")
+            map.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 15f))
+            marker = map.addMarker(markerOptions)
+
+            // Geofence + Circle
+            circle?.remove()
+            circle = map.addCircle(getGeofenceZone(latLng, GEOFENCE_RADIUS))
+        }
+    }
+
 }
