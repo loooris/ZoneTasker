@@ -102,9 +102,8 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMapClic
             val circleOptions =  CircleOptions()
                 .center(latLng)
                 .radius(GEOFENCE_RADIUS)
-                .fillColor(0x40ff0000)
-                .strokeColor(Color.BLUE)
-                .strokeWidth(2f)
+                .strokeColor(ContextCompat.getColor(this, R.color.borderGeofenceZone))
+                .fillColor(ContextCompat.getColor(this, R.color.inGeofenceZone))
 
             circle = map.addCircle(circleOptions)
         }
@@ -241,9 +240,9 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMapClic
 //    }
 
     //It creates GeofenceZones.
-    private fun getGeofenceZone(lat:Double,lon:Double,radius:Double): CircleOptions {
+    private fun getGeofenceZone(latLng:LatLng,radius:Double): CircleOptions {
         return CircleOptions()
-            .center(LatLng(lat, lon))
+            .center(latLng)
             .radius(radius)
             .strokeColor(ContextCompat.getColor(this, R.color.borderGeofenceZone))
             .fillColor(ContextCompat.getColor(this, R.color.inGeofenceZone))
@@ -384,7 +383,7 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMapClic
                 val location = locationResult.lastLocation
                 if (location != null) {
                     callback.invoke(location)
-                    viewModel.checkForGeoFenceEntry(location, GEOFENCE_LAT, GEOFENCE_LONG, GEOFENCE_RADIUS)
+                    viewModel.checkForGeoFenceEntry(location, latLng.latitude, latLng.longitude, GEOFENCE_RADIUS)
                 }
             }
         }, null)
@@ -407,9 +406,8 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMapClic
         val circleOptions =  CircleOptions()
             .center(LatLng(latLng.latitude, latLng.longitude))
             .radius(GEOFENCE_RADIUS)
-            .fillColor(0x40ff0000)
-            .strokeColor(Color.BLUE)
-            .strokeWidth(2f)
+            .strokeColor(ContextCompat.getColor(this, R.color.borderGeofenceZone))
+            .fillColor(ContextCompat.getColor(this, R.color.inGeofenceZone))
 
         circle = map.addCircle(circleOptions)
 
