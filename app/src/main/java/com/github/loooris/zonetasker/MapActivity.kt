@@ -70,9 +70,9 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMapClic
         //Geneve
         private var GEOFENCE_LAT = 46.2043907
         private var GEOFENCE_LONG = 6.1431577
-        //
 
-        private const val GEOFENCE_RADIUS = 50.00
+
+        private const val GEOFENCE_RADIUS = 1000.00
         private const val CHANNEL_ID = "200"
         private const val NOTIFICATION_ID = 103
         private const val CHANNEL_NAME = "PushNotificationChannel"
@@ -279,6 +279,8 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMapClic
         setupMap(googleMap)
         getCurrentLocation()
 
+        // Set up on map click listener to add marker on click and remove old marker
+        googleMap.setOnMapClickListener(this)
 
 
 //        // Set up on map click listener to add marker on click and remove old marker todo rajouter
@@ -292,10 +294,10 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMapClic
 
     private fun setupMap(googleMap: GoogleMap) {
         map = googleMap
-        map?.uiSettings?.isScrollGesturesEnabled = true
-        map?.uiSettings?.setAllGesturesEnabled(true)
-        map?.uiSettings?.isMyLocationButtonEnabled = true
-        map?.addCircle(getGeofenceZone(GEOFENCE_LAT, GEOFENCE_LONG, GEOFENCE_RADIUS))
+        map.uiSettings.isScrollGesturesEnabled = true
+        map.uiSettings.setAllGesturesEnabled(true)
+        map.uiSettings.isMyLocationButtonEnabled = true
+        map.addCircle(getGeofenceZone(GEOFENCE_LAT, GEOFENCE_LONG, GEOFENCE_RADIUS))
     }
 
     private fun getCurrentLocation() {
@@ -362,9 +364,15 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMapClic
 
     // Add new marker on map click and remove old marker
     override fun onMapClick(latLng: LatLng) {
+
+        // Marker
         marker?.remove()
         val markerOptions = MarkerOptions().position(latLng)
         marker = map.addMarker(markerOptions)
+
+        // Geofence + Circle
+        map.addCircle(getGeofenceZone(latLng.latitude, latLng.longitude, GEOFENCE_RADIUS))
+
     }
 
 //    fun addMarkerAtCurrentLocation(view: View) { todo à faire
