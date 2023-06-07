@@ -60,9 +60,7 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMapClic
     private var latLng = LatLng(46.2043907,6.1431577)
 
     private lateinit var viewModel: MainVM
-//    private var map: GoogleMap? = null
-    private lateinit var map: GoogleMap // todo à voir
-//    private lateinit var currentLocation : LocationCallback // todo à voir
+    private lateinit var map: GoogleMap
     private val locationRequest = LocationRequest()
     private var initiateMapZoom = true
     private lateinit var fusedLocationClient: FusedLocationProviderClient
@@ -90,10 +88,6 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMapClic
 
         binding = ActivityMapBinding.inflate(layoutInflater)
         setContentView(binding.root)
-
-//        fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this) //todo
-
-//        getCurrentLocationUser() todo ancien
 
         //As soon as the application starts, we get the location permission and create the map.
         askLocationPermission()
@@ -141,33 +135,8 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMapClic
         }
     }
 
-//    private fun getCurrentLocationUser() { todo ancien check
-//
-//
-//        //Get Location, the last we have (most recently)
-//        fusedLocationProviderClient.lastLocation.addOnSuccessListener {
-//                location ->
-//            //Check if location not null (can happen if location turn off on device)
-//            if(location != null){
-//                currentLocation=location
-//                Toast.makeText(applicationContext, currentLocation.latitude.toString()+""+
-//                        currentLocation.longitude.toString(), Toast.LENGTH_LONG).show()
-//
-//                //Define when the map is ready to be used.
-//                val mapFragment = supportFragmentManager
-//                    .findFragmentById(R.id.map) as SupportMapFragment
-//                mapFragment.getMapAsync(this)
-//            }
-//        }
-//    }
 
     private fun initUIComponent(){
-//        todo check
-//        val btnUpdateGeoFenceZone = findViewById<MaterialButton>(com.google.android.gms.location.R.id.btnUpdateGeoFenceZone)
-//
-//        val edtGeofenceZone = findViewById<AutoCompleteTextView>(com.google.android.gms.location.R.id.edtGeofenceZone)
-//        val edtGeofenceRadius = findViewById<EditText>(com.google.android.gms.location.R.id.edtGeofenceRadius)
-
 
         // FAB button going to optionsMenu
         val fab: FloatingActionButton = findViewById(R.id.goToOptionsFAB)
@@ -188,33 +157,6 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMapClic
             }
         }
     }
-
-//    private fun addCircleToMap(input:String,radius:Double){ todo check
-//        val g = Geocoder(this)
-//
-//        var addressList: List<Address> = listOf()
-//
-//        try {
-//            addressList = g.getFromLocationName(input, 1)
-//        }
-//        catch (e: IOException) {
-//            Toast.makeText(this, "Location not found", Toast.LENGTH_SHORT).show()
-//            Log.d("","error catched at addCircleToMap: $e")
-//        }
-//        finally {
-//            //To be sure addressList not empty just in case no element at 0 index.
-//            if (addressList.isNotEmpty()) {
-//                val address = addressList[0]
-//                if (address.hasLatitude() && address.hasLongitude()) {
-//                    map?.clear()
-//                    map?.addCircle(getGeofenceZone(address.latitude,address.longitude,radius))
-//                }
-//            }
-//            else {
-//                Toast.makeText(this, "Location not found", Toast.LENGTH_SHORT).show()
-//            }
-//        }
-//    }
 
     //It creates GeofenceZones.
     private fun getGeofenceZone(latLng:LatLng,radius:Double): CircleOptions {
