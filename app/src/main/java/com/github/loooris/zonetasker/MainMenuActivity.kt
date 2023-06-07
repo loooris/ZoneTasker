@@ -12,7 +12,7 @@ class MainMenuActivity : AppCompatActivity() {
 
         val buttonClick = findViewById<Button>(R.id.MessageButton)
         buttonClick.setOnClickListener {
-            val intent = Intent(this, MapMenu::class.java)
+            val intent = Intent(this, MapActivity::class.java)
             startActivity(intent)
         }
     }

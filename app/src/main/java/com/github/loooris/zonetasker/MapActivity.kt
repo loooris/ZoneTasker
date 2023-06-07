@@ -14,16 +14,16 @@ import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MarkerOptions
-import com.github.loooris.zonetasker.databinding.ActivityMapMenuBinding
+import com.github.loooris.zonetasker.databinding.ActivityMapBinding
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.maps.model.Marker
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 
 
-class MapMenu : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMapClickListener {
+class MapActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMapClickListener {
 
-    private lateinit var binding: ActivityMapMenuBinding
+    private lateinit var binding: ActivityMapBinding
 
     private lateinit var currentLocation : Location
     private lateinit var fusedLocationProviderClient: FusedLocationProviderClient
@@ -35,7 +35,7 @@ class MapMenu : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMapClickLis
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        binding = ActivityMapMenuBinding.inflate(layoutInflater)
+        binding = ActivityMapBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
         fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this)

@@ -28,7 +28,9 @@
         <activity
             android:name=".OptionsMenuActivity"
             android:exported="false" />
-
+        <activity
+            android:name=".MapActivity"
+            android:exported="false" />
         <meta-data
             android:name="com.google.android.geo.API_KEY"
             android:value="${MAPS_API_KEY}" />
