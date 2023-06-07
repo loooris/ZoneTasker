@@ -238,15 +238,11 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMapClic
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
-        when (requestCode)
-        {
-            LOCATION_REQUEST_CODE -> when (resultCode)
-            {
-                Activity.RESULT_OK ->
-                {
+        when (requestCode) {
+            LOCATION_REQUEST_CODE -> when (resultCode) {
+                Activity.RESULT_OK -> {
                     requestMyGpsLocation { location ->
-                        if (initiateMapZoom)
-                        {
+                        if (initiateMapZoom) {
                             initiateMapZoom = false
                             map?.animateCamera(CameraUpdateFactory.newLatLngZoom(LatLng(location.latitude, location.longitude), 15.0F))
                         }
