@@ -10,7 +10,7 @@ class MainMenuActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main_menu)
 
-        val buttonClick = findViewById<Button>(R.id.MessageButton)
+        val buttonClick = findViewById<Button>(R.id.ReminderButton)
         buttonClick.setOnClickListener {
             val intent = Intent(this, MapActivity::class.java)
             startActivity(intent)
