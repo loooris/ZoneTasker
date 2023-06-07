@@ -207,7 +207,9 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMapClic
 
         fusedLocationClient.lastLocation.addOnSuccessListener(this) { location ->
             if (location != null) {
-                map?.addMarker(MarkerOptions().position(LatLng(location.latitude, location.longitude)).title("Current Location"))
+                val markerOptions = MarkerOptions().position(LatLng(location.latitude, location.longitude)).title("Current Location")
+                marker = map.addMarker(markerOptions)
+                //latLng = LatLng(location.latitude, location.longitude) sert a rien pour le moment mais j'essaie de regler le soucis du cercle rouge au debut
             }
         }
     }
@@ -321,7 +323,7 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMapClic
 
 
         val circleOptions =  CircleOptions()
-            .center(LatLng(GEOFENCE_LAT, GEOFENCE_LONG))
+            .center(latLng)
             .radius(GEOFENCE_RADIUS)
             .fillColor(0x40ff0000)
             .strokeColor(Color.BLUE)
@@ -348,7 +350,7 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMapClic
                 requestMyGpsLocation { location ->
                     if (initiateMapZoom) {
                         initiateMapZoom = false
-                        map?.animateCamera(CameraUpdateFactory.newLatLngZoom(LatLng(location.latitude, location.longitude), 10F))
+                        map?.animateCamera(CameraUpdateFactory.newLatLngZoom(LatLng(location.latitude, location.longitude), 12F))
                     }
                 }
             }
