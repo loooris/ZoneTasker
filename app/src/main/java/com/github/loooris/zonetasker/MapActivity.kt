@@ -297,26 +297,24 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMapClic
         setupMap(googleMap)
         getCurrentLocation()
 
-        // Fetch the current location and set the geofence
+        // Fetch the current location and set the marker + geofence
         requestMyGpsLocation { location ->
             val currentLatLng = LatLng(location.latitude, location.longitude)
             map.clear() // Clear any existing markers or circles
+
+            // Marker
+            val markerOptions = MarkerOptions().position(currentLatLng).title("Current Location")
+            marker = map.addMarker(markerOptions)
+
+            // Geofence
             circle = map.addCircle(getGeofenceZone(currentLatLng, GEOFENCE_RADIUS))
-            map.animateCamera(CameraUpdateFactory.newLatLngZoom(currentLatLng, 12F))
+            map.animateCamera(CameraUpdateFactory.newLatLngZoom(currentLatLng, 25F))
         }
 
         // Set up on map click listener to add marker on click and remove old marker
         googleMap.setOnMapClickListener(this)
-
-
-//        // Set up on map click listener to add marker on click and remove old marker todo rajouter
-//        googleMap.setOnMapClickListener(this)
-//        val latLng= LatLng(currentLocation.latitude, currentLocation.longitude)
-//        val markerOptions = MarkerOptions().position(latLng).title("Current Location")
-//
-//        googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 15f))
-//        marker = googleMap.addMarker(markerOptions)
     }
+
 
     private fun setupMap(googleMap: GoogleMap) {
         map = googleMap
