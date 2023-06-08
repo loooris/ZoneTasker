@@ -1,6 +1,5 @@
 package com.github.loooris.zonetasker.utils
 
-
 import android.util.Log
 import androidx.annotation.MainThread
 import androidx.lifecycle.LifecycleOwner

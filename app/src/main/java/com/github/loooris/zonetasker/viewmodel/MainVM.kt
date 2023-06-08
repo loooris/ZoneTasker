@@ -1,4 +1,4 @@
-package com.github.loooris.viewmodel
+package com.github.loooris.zonetasker.viewmodel
 
 import android.location.Location
 import androidx.lifecycle.ViewModel
