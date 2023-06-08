@@ -3,26 +3,29 @@ package com.github.loooris.zonetasker
 import MessageFragment
 import ReminderFragment
 import SettingsFragment
+import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.view.View
 import androidx.fragment.app.Fragment
 import com.google.android.material.appbar.MaterialToolbar
+import com.google.android.material.floatingactionbutton.FloatingActionButton
 
 class OptionsMenuActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_options_menu)
 
-        val selectedOption = intent.getStringExtra("option")
-
-        val messageFragment = MessageFragment()
-        val reminderFragment = ReminderFragment()
-        val settingsFragment = SettingsFragment()
-
-        when (selectedOption) {
-            "message" -> setCurrentFragment(messageFragment)
-            "reminder" -> setCurrentFragment(reminderFragment)
-            "settings" -> setCurrentFragment(settingsFragment)
+        val option = intent.getStringExtra("option")
+        if (option != null) {
+            when (option) {
+                "reminder" -> supportFragmentManager.beginTransaction()
+                    .replace(R.id.flFragment, ReminderFragment()).commit()
+                "message" -> supportFragmentManager.beginTransaction()
+                    .replace(R.id.flFragment, MessageFragment()).commit()
+                "settings" -> supportFragmentManager.beginTransaction()
+                    .replace(R.id.flFragment, SettingsFragment()).commit()
+            }
         }
 
         // TopAppBar Handling
@@ -31,12 +34,12 @@ class OptionsMenuActivity : AppCompatActivity() {
             // Handle navigation icon press
             finish()
         }
-    }
 
-    private fun setCurrentFragment(fragment: Fragment) {
-        supportFragmentManager.beginTransaction().apply {
-            replace(R.id.flFragment, fragment)
-            commit()
+        // DoneFAB Handling
+        val doneFab = findViewById<FloatingActionButton>(R.id.DoneFAB)
+        doneFab.setOnClickListener {
+            val intent = Intent(this, MapActivity::class.java)
+            startActivity(intent)
         }
     }
 }

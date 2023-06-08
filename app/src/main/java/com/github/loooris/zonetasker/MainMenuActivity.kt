@@ -10,17 +10,17 @@ class MainMenuActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main_menu)
+        val intent = Intent(this, OptionsMenuActivity::class.java)
 
-        val buttonClickReminder = findViewById<Button>(R.id.ReminderButton)
-        buttonClickReminder.setOnClickListener {
-            val intent = Intent(this, MapActivity::class.java)
-            intent.putExtra("BUTTON_CLICKED", "buttonClickReminder")
-            startActivity(intent)
-        }
 
         val buttonClickMessage = findViewById<Button>(R.id.MessageButton)
         buttonClickMessage.setOnClickListener {
             Toast.makeText(this, "Coming soon!", Toast.LENGTH_SHORT).show()
+        }
+
+        val buttonClickReminder = findViewById<Button>(R.id.ReminderButton)
+        buttonClickReminder.setOnClickListener { intent.putExtra("option", "reminder")
+            startActivity(intent)
         }
 
         val buttonClickSettings = findViewById<Button>(R.id.SettingsButton)

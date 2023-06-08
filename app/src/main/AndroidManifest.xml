@@ -19,10 +19,14 @@
         android:theme="@style/Theme.ZoneTasker"
         tools:targetApi="31">
         <activity
+            android:name=".GeofenceMapActivity"
+            android:exported="false" />
+        <activity
             android:name=".MainMenuActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
@@ -32,6 +36,7 @@
         <activity
             android:name=".MapActivity"
             android:exported="false" />
+
         <meta-data
             android:name="com.google.android.geo.API_KEY"
             android:value="${MAPS_API_KEY}" />
