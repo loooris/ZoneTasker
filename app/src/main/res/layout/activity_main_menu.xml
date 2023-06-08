@@ -32,7 +32,7 @@
         app:layout_constraintTop_toBottomOf="@+id/MessageButton" />
 
     <Button
-        android:id="@+id/SettingsBbutton"
+        android:id="@+id/SettingsButton"
         android:layout_width="145dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="36dp"

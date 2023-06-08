@@ -14,6 +14,7 @@ class MainMenuActivity : AppCompatActivity() {
         val buttonClickReminder = findViewById<Button>(R.id.ReminderButton)
         buttonClickReminder.setOnClickListener {
             val intent = Intent(this, MapActivity::class.java)
+            intent.putExtra("BUTTON_CLICKED", "buttonClickReminder")
             startActivity(intent)
         }
 
@@ -22,7 +23,7 @@ class MainMenuActivity : AppCompatActivity() {
             Toast.makeText(this, "Coming soon!", Toast.LENGTH_SHORT).show()
         }
 
-        val buttonClickSettings = findViewById<Button>(R.id.SettingsBbutton)
+        val buttonClickSettings = findViewById<Button>(R.id.SettingsButton)
         buttonClickSettings.setOnClickListener {
             Toast.makeText(this, "Coming soon!", Toast.LENGTH_SHORT).show()
         }
