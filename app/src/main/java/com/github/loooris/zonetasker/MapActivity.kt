@@ -147,11 +147,12 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMapClic
     private fun initUIComponent(){
 
         // FAB button going to optionsMenu
-        val fab: FloatingActionButton = findViewById(R.id.goToOptionsFAB)
+        val fab: FloatingActionButton = findViewById(R.id.goToGeofenceMapFAB)
         fab.setOnClickListener {
-            val intent = Intent(this, OptionsMenuActivity::class.java)
+            val intent = Intent(this, GeofenceMapActivity::class.java)
             startActivity(intent)
         }
+
     }
 
     //Responsible for add marker in current location.

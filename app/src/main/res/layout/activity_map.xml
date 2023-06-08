@@ -51,12 +51,14 @@
     <com.google.android.material.bottomappbar.BottomAppBar
         android:id="@+id/bottomAppBar"
         style="@style/Widget.Material3.BottomAppBar"
-        android:layout_width="409dp"
-        android:layout_height="85dp"
+        android:layout_width="match_parent"
+        android:layout_height="75dp"
         android:layout_gravity="bottom"
+        android:backgroundTint="@color/quantum_white_100"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
+        app:layout_constraintStart_toStartOf="parent"
+        tools:ignore="BottomAppBar" />
 
 
     <com.google.android.material.button.MaterialButton
@@ -74,12 +76,12 @@
         app:layout_constraintEnd_toEndOf="parent" />
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
-        android:id="@+id/goToOptionsFAB"
+        android:id="@+id/goToGeofenceMapFAB"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal"
         android:layout_marginEnd="16dp"
-        android:layout_marginBottom="16dp"
+        android:layout_marginBottom="8dp"
         android:clickable="true"
         app:elevation="0dp"
         app:layout_constraintBottom_toBottomOf="parent"
@@ -91,12 +93,12 @@
         android:layout_width="260dp"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom"
-        android:layout_marginBottom="16dp"
+        android:layout_marginBottom="8dp"
         android:valueFrom="20.0"
         android:valueTo="150.0"
         app:labelBehavior="gone"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toStartOf="@+id/goToOptionsFAB"
+        app:layout_constraintEnd_toStartOf="@+id/goToGeofenceMapFAB"
         app:layout_constraintStart_toStartOf="parent" />
 
 
