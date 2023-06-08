@@ -18,7 +18,9 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
 import android.view.View
+import android.view.ViewGroup
 import android.widget.AutoCompleteTextView
+import android.widget.Button
 import android.widget.EditText
 import android.widget.Toast
 import androidx.core.app.ActivityCompat
@@ -45,8 +47,11 @@ import com.google.android.gms.location.LocationSettingsStatusCodes
 import com.google.android.gms.maps.model.Circle
 import com.google.android.gms.maps.model.CircleOptions
 import com.google.android.gms.maps.model.Marker
+import com.google.android.material.appbar.AppBarLayout
 import com.google.android.material.appbar.MaterialToolbar
+import com.google.android.material.bottomappbar.BottomAppBar
 import com.google.android.material.button.MaterialButton
+import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.slider.Slider
 import java.io.IOException
@@ -69,6 +74,8 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMapClic
 
     private var currentLocation: Location? = null
 
+    // Add a flag variable to track the map clickability
+    private var isMapClickable = true
 
     companion object {
         private const val LOCATION_PERMISSION = 101
@@ -144,16 +151,68 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMapClic
     }
 
 
-    private fun initUIComponent(){
+    private fun initUIComponent() {
+        // Find the BottomAppBar
+        val bottomAppBar: BottomAppBar = findViewById(R.id.bottomAppBar)
 
-        // FAB button going to optionsMenu
-        val fab: FloatingActionButton = findViewById(R.id.goToGeofenceMapFAB)
-        fab.setOnClickListener {
-            val intent = Intent(this, GeofenceMapActivity::class.java)
+        // Find the Slider
+        val slider: Slider = findViewById(R.id.slider)
+
+        // Find the FloatingActionButton for going to the geofence map
+        val goToGeofenceMapFAB: FloatingActionButton = findViewById(R.id.goToGeofenceMapFAB)
+
+        // Find the Button for adding a marker
+        val btnAddMarker: Button = findViewById(R.id.btn_add_marker)
+
+        // Find the ExtendedFloatingActionButton for going to the main menu
+        val goToMainMenuFAB: ExtendedFloatingActionButton = findViewById(R.id.goToMainMenuFAB)
+
+        // Find the AppBarLayout to be initially hidden
+        val geofenceMapAppBarLayout: AppBarLayout = findViewById(R.id.geofenceMapAppBarLayout)
+
+        // Set the AppBarLayout visibility to GONE initially
+        geofenceMapAppBarLayout.visibility = View.GONE
+
+        // Hide the goToMainMenuFAB initially
+        goToMainMenuFAB.hide()
+
+        // Set a click listener for the FloatingActionButton
+        goToMainMenuFAB.setOnClickListener {
+            val intent = Intent(this, MainMenuActivity::class.java)
             startActivity(intent)
         }
 
+        goToGeofenceMapFAB.setOnClickListener {
+
+            // Disable map click
+            isMapClickable = false
+
+            // Remove the Slider
+            val parentViewSlider: ViewGroup = slider.parent as ViewGroup
+            parentViewSlider.removeView(slider)
+
+            // Remove the goToGeofenceMapFAB button
+            val parentViewGoToFAB: ViewGroup = goToGeofenceMapFAB.parent as ViewGroup
+            parentViewGoToFAB.removeView(goToGeofenceMapFAB)
+
+            // Remove the btn_add_marker button
+            val parentViewAddMarker: ViewGroup = btnAddMarker.parent as ViewGroup
+            parentViewAddMarker.removeView(btnAddMarker)
+
+            // Remove the BottomAppBar
+            val parentView: ViewGroup = bottomAppBar.parent as ViewGroup
+            parentView.removeView(bottomAppBar)
+
+            // Show the AppBarLayout
+            geofenceMapAppBarLayout.visibility = View.VISIBLE
+
+            // Show the goToMainMenuFAB
+            goToMainMenuFAB.show()
+
+        }
     }
+
+
 
     //Responsible for add marker in current location.
     private fun initFusedLocationClient(){
@@ -334,10 +393,11 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMapClic
     }
 
 
-
     // Add new marker on map click and remove old marker
     override fun onMapClick(latLng: LatLng) {
 
+        // Check if the map is clickable
+        if (isMapClickable) {
         // Marker
         marker?.remove()
         val markerOptions = MarkerOptions().position(latLng)
@@ -348,6 +408,7 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMapClic
         // Geofence + Circle
         circle?.remove()
         circle = map.addCircle(getGeofenceZone(latLng, GEOFENCE_RADIUS))
+        }
 
     }
 

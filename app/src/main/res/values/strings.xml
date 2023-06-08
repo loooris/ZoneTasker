@@ -9,6 +9,9 @@
     <string name="settings">Settings</string>
     <string name="optionsToolbar">Setup</string>
     <string name="mapToolbar">Select a zone</string>
+    <string name="geofenceMapToolbar">Zone map</string>
+    <string name="geofenceMapToolbarSubtitle">Map of all defined zones</string>
+    <string name="goToMainMenu">Go to Menu</string>
     <string name="trigger">Trigger when</string>
     <string-array name="trigger_list">
         <item name="entering">Entering</item>
