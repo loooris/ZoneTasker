@@ -45,6 +45,7 @@ import com.google.android.gms.location.LocationSettingsStatusCodes
 import com.google.android.gms.maps.model.Circle
 import com.google.android.gms.maps.model.CircleOptions
 import com.google.android.gms.maps.model.Marker
+import com.google.android.material.appbar.MaterialToolbar
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.slider.Slider
@@ -88,6 +89,13 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMapClic
 
         binding = ActivityMapBinding.inflate(layoutInflater)
         setContentView(binding.root)
+
+        // TopAppBar Handling
+        val mapTopAppBar = findViewById<MaterialToolbar>(R.id.MapToolbar)
+        mapTopAppBar.setNavigationOnClickListener {
+            // Handle navigation icon press
+            finish()
+        }
 
         //As soon as the application starts, we get the location permission and create the map.
         askLocationPermission()
@@ -257,6 +265,7 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMapClic
         map.uiSettings.isScrollGesturesEnabled = true
         map.uiSettings.setAllGesturesEnabled(true)
         map.uiSettings.isMyLocationButtonEnabled = true
+        map.setPadding(0, 175, 0, 0)
 
         circle = map.addCircle(getGeofenceZone(latLng, GEOFENCE_RADIUS))
 
