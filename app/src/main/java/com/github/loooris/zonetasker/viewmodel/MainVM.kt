@@ -9,15 +9,20 @@ import com.google.maps.android.SphericalUtil
 class MainVM:ViewModel() {
     val showNotificationEvent by lazy { SingleLiveEvent<Void>() }
 
-    fun checkForGeoFenceEntry(userLocation: Location, geofenceLat: Double, geofenceLong: Double, radius: Double) {
+    fun checkForGeoFenceEntryorExit(userLocation: Location, geofenceLat: Double, geofenceLong: Double, radius: Double, selectedTrigger: String) {
         val startLatLng = LatLng(userLocation.latitude, userLocation.longitude)
         val geofenceLatLng = LatLng(geofenceLat, geofenceLong)
 
         val distanceInMeters = SphericalUtil.computeDistanceBetween(startLatLng, geofenceLatLng)
 
-        if (distanceInMeters < radius) {
+        if (distanceInMeters < radius && selectedTrigger == "Entering") {
             // User is inside the Geo-fence
             showNotificationEvent.call()
+        } else if (distanceInMeters > radius && selectedTrigger == "Exiting"){
+            // User is outside the Geo-fence
+            showNotificationEvent.call()
         }
+
     }
+
 }

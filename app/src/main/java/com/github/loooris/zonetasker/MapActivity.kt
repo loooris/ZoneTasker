@@ -382,12 +382,13 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMapClic
     @SuppressLint("MissingPermission")
     private fun requestMyGpsLocation(callback: (location: Location) -> Unit) {
         val client = LocationServices.getFusedLocationProviderClient(this)
+        val selectedTrigger = ReminderFragment.selectedTrigger
         client.requestLocationUpdates(locationRequest, object : LocationCallback() {
             override fun onLocationResult(locationResult: LocationResult) {
                 val location = locationResult.lastLocation
                 if (location != null) {
                     callback.invoke(location)
-                    viewModel.checkForGeoFenceEntry(location, latLng.latitude, latLng.longitude, GEOFENCE_RADIUS)
+                    viewModel.checkForGeoFenceEntryorExit(location, latLng.latitude, latLng.longitude, GEOFENCE_RADIUS, selectedTrigger)
                 }
             }
         }, null)
