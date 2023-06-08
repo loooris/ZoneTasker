@@ -1,11 +1,8 @@
 package com.github.loooris.zonetasker.viewmodel
 
 import android.location.Location
-import android.util.Log
-import android.widget.Toast
 import androidx.lifecycle.ViewModel
 import com.github.loooris.zonetasker.MainMenuActivity
-import com.github.loooris.zonetasker.MapActivity
 import com.github.loooris.zonetasker.utils.SingleLiveEvent
 import com.google.android.gms.maps.model.LatLng
 import com.google.maps.android.SphericalUtil
