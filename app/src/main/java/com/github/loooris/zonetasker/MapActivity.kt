@@ -16,6 +16,7 @@ import android.location.Location
 import android.os.Build
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.telephony.SmsManager
 import android.util.Log
 import android.view.View
 import android.view.ViewGroup
@@ -255,6 +256,8 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMapClic
 
     private fun initObservers() {
         viewModel.showNotificationEvent.observe(this) { showNotification() }
+        viewModel.sendMessageEvent.observe(this) { sendMessage() }
+        viewModel.showMessageConfirmationNotificationEvent.observe(this) { showMessageConfirmationNotification() }
     }
 
     private fun initMap() {
@@ -279,6 +282,34 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMapClic
         builder.priority = NotificationCompat.PRIORITY_HIGH
         notificationManager.notify(NOTIFICATION_ID, builder.build())
     }
+
+    private fun showMessageConfirmationNotification() {
+        val title = "Message sent!"
+        val notificationManager = applicationContext.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+        val channel: NotificationChannel?
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            channel = NotificationChannel(CHANNEL_ID, CHANNEL_NAME, NotificationManager.IMPORTANCE_HIGH)
+            notificationManager.createNotificationChannel(channel)
+        }
+
+        val builder = NotificationCompat.Builder(applicationContext, CHANNEL_ID)
+            .setContentTitle(title)
+            .setAutoCancel(true)
+            .setSmallIcon(R.drawable.ic_send )
+        builder.priority = NotificationCompat.PRIORITY_HIGH
+        notificationManager.notify(NOTIFICATION_ID, builder.build())
+    }
+
+    private fun sendMessage() {
+        val message = MessageFragment.message
+        val phoneNumber = MessageFragment.phoneNumber
+
+        // send text message
+        val smsManager = SmsManager.getDefault()
+        smsManager.sendTextMessage(phoneNumber, null, message, null, null)
+    }
+
 
     override fun onMapReady(googleMap: GoogleMap) {
         setupMap(googleMap)
@@ -382,7 +413,15 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMapClic
     @SuppressLint("MissingPermission")
     private fun requestMyGpsLocation(callback: (location: Location) -> Unit) {
         val client = LocationServices.getFusedLocationProviderClient(this)
-        val selectedTrigger = ReminderFragment.selectedTrigger
+
+        // Get the selected trigger
+        var selectedTrigger = ""
+        if(MainMenuActivity.option == "reminder"){
+            selectedTrigger = ReminderFragment.selectedTrigger
+        } else if (MainMenuActivity.option == "message"){
+            selectedTrigger = MessageFragment.selectedTrigger
+        }
+
         client.requestLocationUpdates(locationRequest, object : LocationCallback() {
             override fun onLocationResult(locationResult: LocationResult) {
                 val location = locationResult.lastLocation

@@ -20,12 +20,12 @@ class ReminderFragment : Fragment(R.layout.fragment_reminder) {
         super.onViewCreated(view, savedInstanceState)
 
         val messageField = view.findViewById<TextInputEditText>(R.id.messageField)
-        val autoCompleteTextView = view.findViewById<AutoCompleteTextView>(R.id.autoCompleteTextView)
 
         // Trigger Field Handling
         // Set up the auto complete text view
         val triggerList = resources.getStringArray(R.array.trigger_list)
         val adapter = ArrayAdapter(requireContext(), R.layout.list_item, triggerList)
+        val autoCompleteTextView = view.findViewById<AutoCompleteTextView>(R.id.autoCompleteTextView)
         autoCompleteTextView.setAdapter(adapter)
         autoCompleteTextView.threshold = 1
 
