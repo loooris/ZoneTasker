@@ -55,7 +55,7 @@ class MessageFragment : Fragment(R.layout.fragment_message) {
         }
 
         // phoneNumber Field Handling
-        val phoneNumberField = view.findViewById<TextInputEditText>(R.id.phoneNumberField)
+        phoneNumberField = view.findViewById<TextInputEditText>(R.id.phoneNumberField)
         phoneNumberField.addTextChangedListener(object : TextWatcher {
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
                 // This method is called before the text is changed

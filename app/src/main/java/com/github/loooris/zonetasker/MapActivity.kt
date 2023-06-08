@@ -72,7 +72,7 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMapClic
     private val locationRequest = LocationRequest()
     private var initiateMapZoom = true
     private lateinit var fusedLocationClient: FusedLocationProviderClient
-    private var GEOFENCE_RADIUS = 50.00
+    private var GEOFENCE_RADIUS = 20.00
 
     private var currentLocation: Location? = null
 
